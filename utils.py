@@ -97,7 +97,10 @@ def letterbox_image(image, size, fillValue=[128, 128, 128]):
     new_w = int(image_w * min(w * 1.0 / image_w, h * 1.0 / image_h))
     new_h = int(image_h * min(w * 1.0 / image_w, h * 1.0 / image_h))
 
-    resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+    if new_h < h or new_w < w:
+        resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    else:
+        resized_image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
     # cv2.imwrite('tmp/test.png', resized_image[...,::-1])
     if fillValue is None:
         fillValue = [int(x.mean()) for x in cv2.split(np.array(image))]
@@ -167,22 +170,35 @@ def adjust_lines(RowsLines, ColsLines, alph=50):
             if i != j:
                 x3, y3, x4, y4 = ColsLines[j]
                 cx2, cy2 = (x3 + x4) / 2, (y3 + y4) / 2
+                delta_x = x1 - x4
                 if (x3 < cx1 < x4 or y3 < cy1 < y4) or (x1 < cx2 < x2 or y1 < cy2 < y2):
                     continue
                 else:
                     r = sqrt((x1, y1), (x3, y3))
                     if r < alph:
-                        newColsLines.append([x1, y1, x3, y3])
+                        if delta_x == 0.0:
+                            newColsLines.append([x1, y1, x3, y3])
+                        else:
+                            newRowsLines.append([x1, y1, x3, y3])
                     r = sqrt((x1, y1), (x4, y4))
                     if r < alph:
-                        newColsLines.append([x1, y1, x4, y4])
+                        if delta_x == 0.0:
+                            newColsLines.append([x1, y1, x4, y4])
+                        else:
+                            newRowsLines.append([x1, y1, x4, y4])
 
                     r = sqrt((x2, y2), (x3, y3))
                     if r < alph:
-                        newColsLines.append([x2, y2, x3, y3])
+                        if delta_x == 0.0:
+                            newColsLines.append([x2, y2, x3, y3])
+                        else:
+                            newRowsLines.append([x2, y2, x3, y3])
                     r = sqrt((x2, y2), (x4, y4))
                     if r < alph:
-                        newColsLines.append([x2, y2, x4, y4])
+                        if delta_x == 0.0:
+                            newColsLines.append([x2, y2, x4, y4])
+                        else:
+                            newRowsLines.append([x2, y2, x4, y4])
 
     return newRowsLines, newColsLines
 
