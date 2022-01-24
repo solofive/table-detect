@@ -172,7 +172,7 @@ model = table_net((None, None, 3), 2)
 model.load_weights(tableModeLinePath)
 
 
-def table_line(img, size=(512, 512), hprob=0.5, vprob=0.5, row=50, col=30, alph=15):
+def table_line(img, size=(512, 512), hprob=0.5, vprob=0.5, row=50, col=15, alph=20):
     sizew, sizeh = size
     inputBlob, fx, fy = letterbox_image(img[..., ::-1], (sizew, sizeh))
     pred = model.predict(np.array([np.array(inputBlob) / 255.0]))
@@ -209,7 +209,7 @@ def table_line(img, size=(512, 512), hprob=0.5, vprob=0.5, row=50, col=30, alph=
         crowlbox = [[xmin, ymin, xmax, ymin], [xmin, ymax, xmax, ymax]]
 
     rowboxes += crowlbox
-    colboxes += ccolbox
+    #colboxes += ccolbox
 
     rboxes_row_, rboxes_col_ = adjust_lines(rowboxes, colboxes, alph=alph)
     rowboxes += rboxes_row_
@@ -218,8 +218,8 @@ def table_line(img, size=(512, 512), hprob=0.5, vprob=0.5, row=50, col=30, alph=
     ncol = len(colboxes)
     for i in range(nrow):
         for j in range(ncol):
-            rowboxes[i] = line_to_line(rowboxes[i], colboxes[j], 10)
-            colboxes[j] = line_to_line(colboxes[j], rowboxes[i], 10)
+            rowboxes[i] = line_to_line(rowboxes[i], colboxes[j], 20)
+            colboxes[j] = line_to_line(colboxes[j], rowboxes[i], 11)
 
     return rowboxes, colboxes
 
